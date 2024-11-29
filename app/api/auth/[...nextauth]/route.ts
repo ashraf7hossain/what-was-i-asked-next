@@ -3,9 +3,15 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { API_ENDPOINTS } from "@/lib/config";
 
 const handler = NextAuth({
+  session: {
+    strategy: "jwt",
+    maxAge: 1 * 24 * 60 * 60,
+    updateAge: 1 * 60 * 60,
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
+      secret: "it's very secret",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -43,9 +49,9 @@ const handler = NextAuth({
 
           // Return the user object with token
           return {
-            // id: data.user.id || "1",
-            // email: data.user.email,
-            // name: data.user.name,
+            id: data.user.id || "1",
+            email: data.user.email,
+            name: data.user.name,
             token: data.token,
           };
         } catch (error: any) {
@@ -77,6 +83,7 @@ const handler = NextAuth({
           name: token.name as string,
         };
       }
+      console.log("session => ", session);
       return session;
     },
   },

@@ -12,6 +12,8 @@ import { ArrowBigDown, ArrowBigUp, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { API_ENDPOINTS } from "@/lib/config";
+import { apiClient } from "@/lib/apiClient";
 
 export function PostCard({ post }: { post: Post }) {
   const [votes, setVotes] = useState({
@@ -22,32 +24,28 @@ export function PostCard({ post }: { post: Post }) {
 
   const handleVote = async (direction: "up" | "down") => {
     try {
-      const response = await fetch("/api/protected/votes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          postId: post.id,
-          direction,
-        }),
-      });
+      const response = await apiClient.post<any>(
+        API_ENDPOINTS.votes,
+        { post_id: post.id, value: direction === "up" ? 1 : -1 },
+        { requireAuth: true }
+      );
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          toast({
-            title: "Authentication required",
-            description: "Please sign in to vote",
-            variant: "destructive",
-          });
-          return;
-        }
-        throw new Error("Failed to vote");
-      }
+      // if (!response.ok) {
+      //   if (response.status === 401) {
+      //     toast({
+      //       title: "Authentication required",
+      //       description: "Please sign in to vote",
+      //       variant: "destructive",
+      //     });
+      //     return;
+      //   }
+      //   throw new Error("Failed to vote");
+      // }
 
-      const newVotes = direction === "up" ? votes + 1 : votes - 1;
-      setVotes(newVotes);
+      // const newVotes = direction === "up" ? votes + 1 : votes - 1;
+      // setVotes();
     } catch (error) {
+      console.log("error => ", error);
       toast({
         title: "Error",
         description: "Failed to register vote",

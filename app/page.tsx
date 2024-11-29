@@ -1,12 +1,17 @@
 import { PostCard } from "@/components/post/post-card";
 import { Post } from "@/lib/types";
 import { API_ENDPOINTS } from "@/lib/config";
+import { apiClient } from "@/lib/apiClient";
+import { CreatePost } from "@/components/post/create-post";
 
 export default async function Home() {
-  const res = await fetch(API_ENDPOINTS.posts, {
-    method: "GET"
+  const data = await apiClient.get<any>(API_ENDPOINTS.posts + '/', {
+    method: "GET",
+    cache: "no-cache",
+    headers: {
+      "Cache-Control" : "no-cahce"
+    }
   });
-  const data = await res.json();
   const posts = data.posts
 
   return (
@@ -14,6 +19,7 @@ export default async function Home() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
+        <CreatePost/>
           {posts.map((post: Post) => (
             <PostCard key={post.id} post={post} />
           ))}

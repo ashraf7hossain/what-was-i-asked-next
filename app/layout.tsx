@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AuthButton } from "@/components/auth/auth-button";
 import { NextAuthProvider } from "@/components/providers/next-auth-provider";
+import { Toast, ToastProvider } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +31,7 @@ export default function RootLayout({
               </h1>
               <AuthButton />
             </div>
+            <Toaster />
           </header>
           {children}
         </body>
