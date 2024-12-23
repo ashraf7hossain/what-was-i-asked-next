@@ -5,13 +5,12 @@ import { API_ENDPOINTS } from "@/lib/config";
 const handler = NextAuth({
   session: {
     strategy: "jwt",
-    maxAge: 1 * 24 * 60 * 60,
-    updateAge: 1 * 60 * 60,
+    maxAge: 3 * 24 * 60 * 60, 
+    updateAge: 24 * 60 * 60, 
   },
   providers: [
     CredentialsProvider({
       name: "Credentials",
-      secret: "it's very secret",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -25,9 +24,9 @@ const handler = NextAuth({
         try {
           const res = await fetch(API_ENDPOINTS.login, {
             method: "POST",
-            headers: { 
+            headers: {
               "Content-Type": "application/json",
-              "Accept": "application/json"
+              Accept: "application/json",
             },
             body: JSON.stringify({
               email: credentials.email,
@@ -35,9 +34,7 @@ const handler = NextAuth({
             }),
           });
 
-          
           const data = await res.json();
-
 
           if (!res.ok) {
             throw new Error(data.message || "Authentication failed");
@@ -67,14 +64,25 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }: any) {
       if (user) {
-        token.accessToken = user.token;
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
+        // Decode the token to get its expiration
+        try {
+          token.accessToken = user.token;
+          token.id = user.id;
+          token.email = user.email;
+          token.name = user.name;
+          const expiresIn = 1 * 24 * 60 * 60; // 3 days
+          token.exp = Math.floor(Date.now() / 1000) + expiresIn;
+        } catch (error) {
+          console.error("Error decoding token:", error);
+          // Fallback expiration if decoding fails
+          const expiresIn = 1 * 24 * 60 * 60; // 3 days
+          token.exp = Math.floor(Date.now() / 1000) + expiresIn;
+        }
       }
+
       return token;
     },
-    async session({ session, token }:any) {
+    async session({ session, token }: any) {
       if (token) {
         session.accessToken = token.accessToken;
         session.user = {
@@ -83,7 +91,14 @@ const handler = NextAuth({
           name: token.name as string,
         };
       }
-      console.log("session => ", session);
+
+      // More detailed logging
+      console.log(
+        "Token Expiration:",
+        token.exp ? new Date(token.exp * 1000) : "No expiration"
+      );
+      console.log("Current Time:", new Date());
+
       return session;
     },
   },

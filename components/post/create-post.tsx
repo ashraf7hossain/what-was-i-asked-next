@@ -22,7 +22,7 @@ export function CreatePost() {
   };
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 sticky top-0 z-10">
       <Button
         onClick={handleCreatePost}
         variant="outline"

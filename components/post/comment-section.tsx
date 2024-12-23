@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/lib/apiClient";
 import { API_ENDPOINTS } from "@/lib/config";
 import { useSession } from "next-auth/react";
+import { ThreeDotEdit } from "../ui/three-dot-edit";
+import { EditCommentModal } from "./comment-edit-modal";
 
 export function CommentSection({
   comments: initialComments,
@@ -17,11 +19,14 @@ export function CommentSection({
   comments: Comment[];
   postId: string;
 }) {
-  const { data: session, status } = useSession(); // Use `data` for session
+  const { data: session, status } = useSession(); 
+  const [isEditing, setIsEditing] = useState(false);
   const user = session?.user || null;
   const [comments, setComments] = useState(initialComments);
   const [newComment, setNewComment] = useState("");
   const { toast } = useToast();
+
+  const isAuthor = (user as any)?.id === comments[0]?.user_id;
 
   const handleAddComment = async () => {
     if (!user || !newComment.trim()) return;
@@ -34,13 +39,13 @@ export function CommentSection({
       );
 
       const comment = {
-        id       : Math.random().toString(),
-        body     : newComment,
-        user_id  : user.id,
+        id: Math.random().toString(),
+        body: newComment,
+        user_id: (user as any).id,
         user_name: user.name,
-        post_id  : postId,
-        createdAt: new Date().toISOString(),
-        upvotes  : 0,
+        post_id: postId,
+        created_at: new Date().toISOString(),
+        upvotes: 0,
         downvotes: 0,
       };
 
@@ -66,11 +71,15 @@ export function CommentSection({
       console.log("error => ", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: (error as any).message,
         variant: "destructive",
       });
     }
   };
+
+  const onEdit = () => {
+    setIsEditing(true);
+  }
 
   return (
     <div className="space-y-4">
@@ -91,8 +100,13 @@ export function CommentSection({
             <div className="flex justify-between mb-2">
               <span className="font-medium">{comment.user_name}</span>
               <span className="text-sm text-muted-foreground">
-                {new Date(comment.createdAt).toLocaleDateString()}
+                {new Date(comment.created_at).toLocaleDateString()}
               </span>
+              <ThreeDotEdit
+                endpoint={`${API_ENDPOINTS.comment}/${comment.id}`}
+                onEdit={() => onEdit()}
+              />
+            <EditCommentModal open={isEditing} onOpenChange={setIsEditing} comment={comment}/>
             </div>
             <p className="mb-2">{comment.body}</p>
             <div className="flex items-center gap-2">

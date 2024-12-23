@@ -9,7 +9,8 @@ export interface Post {
   id: string;
   title: string;
   body: string;
-  user_id: string
+  tags?: string[];
+  user_id: string;
   user_name: string;
   upvotes: number;
   downvotes: number;
@@ -22,6 +23,8 @@ export interface Comment {
   user_name: string | null | undefined;
   post_id: string;
   upvotes?: number;
-  downvotes?: number; 
+  downvotes?: number;
+  created_at: string;
+  updated_at?: string;
   // votes: number;
 }

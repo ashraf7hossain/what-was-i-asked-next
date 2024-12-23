@@ -5,8 +5,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { AuthButton } from "@/components/auth/auth-button";
 import { NextAuthProvider } from "@/components/providers/next-auth-provider";
-import { Toast, ToastProvider } from "@/components/ui/toast";
 import { Toaster } from "@/components/ui/toaster";
+import Link from "next/link";
+import { NavigationProgress } from "@/components/ui/navigation-progress";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,10 +25,13 @@ export default function RootLayout({
     <html lang="en">
       <NextAuthProvider>
         <body className={inter.className}>
+          <NavigationProgress />
           <header className="border-b">
             <div className="container mx-auto px-4 py-4 flex justify-between items-center">
               <h1 className="text-2xl font-bold">
-                <Brand />
+                <Link href="/">
+                  <Brand />
+                </Link>
               </h1>
               <AuthButton />
             </div>

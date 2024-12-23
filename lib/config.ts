@@ -9,4 +9,5 @@ export const API_ENDPOINTS = {
   votes: `${API_BASE_URL}/api/votes`,
   comment: `${API_BASE_URL}/api/comments`,
   comment_vote: `${API_BASE_URL}/api/comments/votes`,
+  search_by_tags: `${API_BASE_URL}/api/search/tags`,
 } as const;
